@@ -1,15 +1,20 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.health import router as health_router
-from app.core.logging import setup_logging
+from app.api import api_router
 from app.core.config import settings
 
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+)
 
-logger = setup_logging()
-app = FastAPI(title=settings.app_name)
-app.include_router(health_router, prefix="/api")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # We'll lock this down later.
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-
-@app.get("/")
-def root():
-    return {"message": "Serein DataHub API is running"}
+app.include_router(api_router)
