@@ -10,6 +10,7 @@ Endpoints:
 """
 
 from __future__ import annotations
+from app.models.enums import InvestigationStatus
 
 import uuid
 from fastapi import APIRouter, HTTPException, status

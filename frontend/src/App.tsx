@@ -26,10 +26,13 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
-            <Route path="investigations/new" element={<NewInvestigation />} />
-            <Route path="investigations/:investigation_id" element={<InvestigationDetailPage />} />
-            <Route path="reports" element={<ReportsPage />} />
-            <Route path="settings" element={<Settings />} />
+          </Route>
+
+          <Route element={<Layout />}>
+            <Route path="/investigations/new" element={<NewInvestigation />} />
+            <Route path="/investigations/:investigation_id" element={<InvestigationDetailPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
