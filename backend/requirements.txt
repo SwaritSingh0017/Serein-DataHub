@@ -1,6 +1,24 @@
+# Web framework
 fastapi
-uvicorn
-pydantic
 uvicorn[standard]
+
+# Config & validation
+pydantic>=2
 pydantic-settings
 python-dotenv
+
+# AI / Orchestration
+langgraph>=0.2
+openai>=1.40            # OpenAI-compatible client used for NIM (primary) and Ollama (fallback)
+httpx                  # async HTTP for DataHub MCP / GraphQL fallback
+
+# GitHub integration
+pygithub>=2.3
+
+# Code quality
+ruff
+black
+
+# Testing
+pytest
+pytest-asyncio

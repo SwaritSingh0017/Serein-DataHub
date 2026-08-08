@@ -1,0 +1,152 @@
+{
+  "scenario": "sales_dashboard_stopped_updating",
+  "assets": [
+    {
+      "urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)",
+      "name": "analytics.sales_data",
+      "platform": "postgres",
+      "type": "dataset",
+      "description": "Raw sales data from the transactional database. Primary source for sales reporting.",
+      "domain_urn": "urn:li:domain:finance",
+      "owner_urns": ["urn:li:corpuser:finance-team"],
+      "tags": ["urn:li:tag:pii", "urn:li:tag:sensitive"],
+      "glossary_terms": ["urn:li:glossaryTerm:revenue", "urn:li:glossaryTerm:transaction"],
+      "schema": {
+        "urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)",
+        "columns": [
+          {"name": "id", "type": "bigint", "nullable": false, "description": "Primary key", "primary_key": true, "foreign_keys": []},
+          {"name": "amount", "type": "numeric(18,2)", "nullable": false, "description": "Revenue amount (renamed from revenue on 2026-08-04)", "primary_key": false, "foreign_keys": [], "last_modified_at": "2026-08-04T10:00:00Z"},
+          {"name": "transaction_date", "type": "date", "nullable": false, "description": "Date of transaction", "primary_key": false, "foreign_keys": []},
+          {"name": "customer_id", "type": "bigint", "nullable": false, "description": "Customer reference", "primary_key": false, "foreign_keys": ["urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.customers,PROD)"]},
+          {"name": "product_id", "type": "bigint", "nullable": false, "description": "Product reference", "primary_key": false, "foreign_keys": ["urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.products,PROD)"]}
+        ]
+      },
+      "created_at": "2025-01-15T00:00:00Z",
+      "last_modified_at": "2026-08-04T10:00:00Z"
+    },
+    {
+      "urn": "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)",
+      "name": "analytics.fct_sales",
+      "platform": "dbt",
+      "type": "dataset",
+      "description": "dbt model: fact table for sales. Selects from stg_sales_data.",
+      "domain_urn": "urn:li:domain:finance",
+      "owner_urns": ["urn:li:corpuser:analytics-team"],
+      "tags": ["urn:li:tag:dbt", "urn:li:tag:marts"],
+      "glossary_terms": ["urn:li:glossaryTerm:revenue", "urn:li:glossaryTerm:fact_table"],
+      "schema": {
+        "urn": "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)",
+        "columns": [
+          {"name": "sales_id", "type": "bigint", "nullable": false, "description": "Primary key", "primary_key": true, "foreign_keys": []},
+          {"name": "revenue", "type": "numeric(18,2)", "nullable": false, "description": "Revenue amount (REFERENCES OLD COLUMN NAME)", "primary_key": false, "foreign_keys": [], "last_modified_at": "2025-06-01T00:00:00Z"},
+          {"name": "transaction_date", "type": "date", "nullable": false, "description": "Date of transaction", "primary_key": false, "foreign_keys": []},
+          {"name": "customer_id", "type": "bigint", "nullable": false, "description": "Customer reference", "primary_key": false, "foreign_keys": ["urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.dim_customer,PROD)"]},
+          {"name": "product_id", "type": "bigint", "nullable": false, "description": "Product reference", "primary_key": false, "foreign_keys": ["urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.dim_product,PROD)"]}
+        ]
+      },
+      "created_at": "2025-02-01T00:00:00Z",
+      "last_modified_at": "2025-06-01T00:00:00Z"
+    },
+    {
+      "urn": "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)",
+      "name": "sales_dashboard",
+      "platform": "looker",
+      "type": "dashboard",
+      "description": "Executive Sales Dashboard showing daily revenue, trends, and top products.",
+      "domain_urn": "urn:li:domain:finance",
+      "owner_urns": ["urn:li:corpuser:finance-team"],
+      "tags": ["urn:li:tag:executive", "urn:li:tag:looker"],
+      "glossary_terms": ["urn:li:glossaryTerm:revenue", "urn:li:glossaryTerm:kpi"],
+      "schema": null,
+      "created_at": "2025-03-01T00:00:00Z",
+      "last_modified_at": "2025-08-01T00:00:00Z"
+    }
+  ],
+  "schemas": {},
+  "lineage": {
+    "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)": {
+      "upstream": [],
+      "downstream": [
+        {
+          "source_urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)",
+          "target_urn": "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)",
+          "relationship": "produced_from",
+          "pipeline_urn": "urn:li:dataFlow:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)"
+        }
+      ]
+    },
+    "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)": {
+      "upstream": [
+        {
+          "source_urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)",
+          "target_urn": "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)",
+          "relationship": "produced_from",
+          "pipeline_urn": "urn:li:dataFlow:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)"
+        }
+      ],
+      "downstream": [
+        {
+          "source_urn": "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)",
+          "target_urn": "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)",
+          "relationship": "consumed_by",
+          "pipeline_urn": null
+        }
+      ]
+    },
+    "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)": {
+      "upstream": [
+        {
+          "source_urn": "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)",
+          "target_urn": "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)",
+          "relationship": "consumed_by",
+          "pipeline_urn": null
+        }
+      ],
+      "downstream": []
+    }
+  },
+  "ownership": {
+    "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)": [
+      {"asset_urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)", "owner_urn": "urn:li:corpuser:finance-team", "owner_name": "Finance Team", "owner_type": "group", "role": "DataOwner"}
+    ],
+    "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)": [
+      {"asset_urn": "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)", "owner_urn": "urn:li:corpuser:analytics-team", "owner_name": "Analytics Team", "owner_type": "group", "role": "DataOwner"}
+    ],
+    "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)": [
+      {"asset_urn": "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)", "owner_urn": "urn:li:corpuser:finance-team", "owner_name": "Finance Team", "owner_type": "group", "role": "DataOwner"}
+    ]
+  },
+  "tags": {
+    "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)": [
+      {"asset_urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)", "tag_urn": "urn:li:tag:pii", "tag_name": "PII", "description": "Personally Identifiable Information"},
+      {"asset_urn": "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)", "tag_urn": "urn:li:tag:sensitive", "tag_name": "Sensitive", "description": "Sensitive data"}
+    ],
+    "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)": [
+      {"asset_urn": "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)", "tag_urn": "urn:li:tag:dbt", "tag_name": "DBT Model", "description": "Managed by dbt"},
+      {"asset_urn": "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)", "tag_urn": "urn:li:tag:marts", "tag_name": "Marts Layer", "description": "Data marts layer"}
+    ],
+    "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)": [
+      {"asset_urn": "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)", "tag_urn": "urn:li:tag:executive", "tag_name": "Executive Dashboard", "description": "Executive-facing dashboard"},
+      {"asset_urn": "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)", "tag_urn": "urn:li:tag:looker", "tag_name": "Looker", "description": "Looker dashboard"}
+    ]
+  },
+  "domains": {
+    "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)": {"urn": "urn:li:domain:finance", "name": "Finance", "description": "Financial data domain", "parent_domain_urn": null},
+    "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)": {"urn": "urn:li:domain:finance", "name": "Finance", "description": "Financial data domain", "parent_domain_urn": null},
+    "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)": {"urn": "urn:li:domain:finance", "name": "Finance", "description": "Financial data domain", "parent_domain_urn": null}
+  },
+  "glossary": {
+    "urn:li:dataset:(urn:li:dataPlatform:postgres,analytics.sales_data,PROD)": [
+      {"urn": "urn:li:glossaryTerm:revenue", "name": "Revenue", "description": "Total income from sales", "parent_node_urn": null},
+      {"urn": "urn:li:glossaryTerm:transaction", "name": "Transaction", "description": "A single sales transaction", "parent_node_urn": null}
+    ],
+    "urn:li:dataset:(urn:li:dataPlatform:dbt,analytics.fct_sales,PROD)": [
+      {"urn": "urn:li:glossaryTerm:revenue", "name": "Revenue", "description": "Total income from sales", "parent_node_urn": null},
+      {"urn": "urn:li:glossaryTerm:fact_table", "name": "Fact Table", "description": "Table containing measurable events", "parent_node_urn": null}
+    ],
+    "urn:li:dashboard:(urn:li:dataPlatform:looker,sales_dashboard,PROD)": [
+      {"urn": "urn:li:glossaryTerm:revenue", "name": "Revenue", "description": "Total income from sales", "parent_node_urn": null},
+      {"urn": "urn:li:glossaryTerm:kpi", "name": "KPI", "description": "Key Performance Indicator", "parent_node_urn": null}
+    ]
+  }
+}
