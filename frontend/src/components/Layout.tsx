@@ -163,6 +163,49 @@ export function Layout() {
                 <p className="text-xs text-[var(--fg-muted)]">Autonomous AI Data Engineer</p>
               </div>
             </div>
+
+            {/* Top navigation */}
+            <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  cn(
+                    "px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                    isActive
+                      ? "bg-gradient-primary text-white"
+                      : "text-[var(--fg-secondary)] hover:text-[var(--fg-primary)] hover:bg-[var(--bg-tertiary)]"
+                  )
+                }
+              >
+                Dashboard
+              </NavLink>
+              <NavLink
+                to="/investigations/new"
+                className={({ isActive }) =>
+                  cn(
+                    "px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                    isActive
+                      ? "bg-gradient-primary text-white"
+                      : "text-[var(--fg-secondary)] hover:text-[var(--fg-primary)] hover:bg-[var(--bg-tertiary)]"
+                  )
+                }
+              >
+                Investigate
+              </NavLink>
+              <NavLink
+                to="/reports"
+                className={({ isActive }) =>
+                  cn(
+                    "px-3 py-2 text-sm font-medium rounded-lg transition-colors",
+                    isActive
+                      ? "bg-gradient-primary text-white"
+                      : "text-[var(--fg-secondary)] hover:text-[var(--fg-primary)] hover:bg-[var(--bg-tertiary)]"
+                  )
+                }
+              >
+                Reports
+              </NavLink>
+            </nav>
           </div>
         </header>
 
