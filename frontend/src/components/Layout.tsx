@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo, LogoSmall } from "@/components/ui/logo";
 
 export function Layout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -66,7 +67,10 @@ export function Layout() {
             style={{ borderColor: "var(--border-light)" }}
           >
             {!collapsed && (
-              <span className="text-xl font-bold text-gradient animate-fade-in">Serein</span>
+              <Logo size="lg" className="animate-fade-in" />
+            )}
+            {collapsed && (
+              <LogoSmall className="animate-fade-in" />
             )}
             <button
               onClick={() => setCollapsed(!collapsed)}
@@ -149,6 +153,20 @@ export function Layout() {
           collapsed ? "ml-16" : "ml-64"
         )}
       >
+        {/* Header with logo */}
+        <header className="h-16 px-6 border-b glass sticky top-0 z-30" style={{ borderColor: "var(--border-light)" }}>
+          <div className="h-full flex items-center justify-between px-4 max-w-7xl mx-auto">
+            <div className="flex items-center gap-4">
+              <Logo size="md" className="flex-shrink-0" />
+              <div className="hidden md:block">
+                <h1 className="text-lg font-semibold text-[var(--fg-primary)]">Serein DataHub Agent</h1>
+                <p className="text-xs text-[var(--fg-muted)]">Autonomous AI Data Engineer</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main content */}
         <div className="p-6 animate-page-enter">
           <Outlet />
         </div>
